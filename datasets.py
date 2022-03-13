@@ -7,6 +7,27 @@ import pandas as pd
 __all__ = ['VideoDataset', 'VideoLabelDataset']
 
 class VideoDataset(Dataset):
+
+    def __init__(self, csv_file, transform=None):
+        self.dataframe = pd.read_csv(csv_file)
+        self.transform = transform
+
+    def __len__(self):
+        """
+        Returns:
+            int: number of rows of the csv file (not include the header).
+        """
+        return len(self.dataframe)
+
+    def __getitem__(self, index):
+        """ get a video """
+        video = self.dataframe.iloc[index].path
+        #video = "C:/git/video-clip-order-prediction/data/ucf101/video/" + self.dataframe.iloc[index][0]
+        print("video path" + video)
+        if self.transform:
+            video = self.transform(video)
+        return video
+
     """ Video Dataset for loading video.
         It will output only path of video (neither video file path or video folder path). 
         However, you can load video as torch.Tensor (C x L x H x W).
@@ -67,9 +88,13 @@ class VideoDataset(Dataset):
         >>> for videos in data_loader:
         >>>     print(videos.size())
     """
+
+
+
+class VideoLabelDataset(Dataset):
     def __init__(self, csv_file, transform=None):
         self.dataframe = pd.read_csv(csv_file)
-        self.transform = transform 
+        self.transform = transform
 
     def __len__(self):
         """
@@ -79,14 +104,15 @@ class VideoDataset(Dataset):
         return len(self.dataframe)
 
     def __getitem__(self, index):
-        """ get a video """
+        """ get a video and its label """
         video = self.dataframe.iloc[index].path
+        label = self.dataframe.iloc[index].label
+        #video = "C:/git/video-clip-order-prediction/data/ucf101/video/" + self.dataframe.iloc[index][0]
+        print("video path" + video)
         if self.transform:
             video = self.transform(video)
-        return video
+        return video, label
 
-
-class VideoLabelDataset(Dataset):
     """ Dataset Class for Loading Video.
         It will output path and label. However, you can load video as torch.Tensor (C x L x H x W).
         See below for an example of how to read video as torch.Tensor.
@@ -113,24 +139,6 @@ class VideoLabelDataset(Dataset):
         >>> for videos, labels in data_loader:
         >>>     print(videos.size())
     """
-    def __init__(self, csv_file, transform=None):
-        self.dataframe = pd.read_csv(csv_file)
-        self.transform = transform 
-
-    def __len__(self):
-        """
-        Returns:
-            int: number of rows of the csv file (not include the header).
-        """
-        return len(self.dataframe)
-
-    def __getitem__(self, index):
-        """ get a video and its label """
-        video = self.dataframe.iloc[index].path
-        label = self.dataframe.iloc[index].label 
-        if self.transform:
-            video = self.transform(video)
-        return video, label
 
 
 if __name__ == '__main__':

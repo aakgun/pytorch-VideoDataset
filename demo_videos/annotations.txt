@@ -1,0 +1,2 @@
+ApplyEyeMakeup 1 25 0
+Archery 1 25 0
